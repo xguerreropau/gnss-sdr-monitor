@@ -36,6 +36,20 @@ AppDir:
     - liblzma5:amd64
     - libpcre3:amd64
     - libqt5gui5:amd64
+    - libboost-dev
+    - libboost-system-dev
+    - libprotobuf-dev
+    - protobuf-compiler
+    - qtbase5-dev
+    - qtdeclarative5-dev
+    - qtpositioning5-dev
+    - libqt5charts5-dev
+    - qml-module-qtquick2
+    - qml-module-qtquick-controls2
+    - qml-module-qtquick-window2
+    - qml-module-qtlocation
+    - qml-module-qtpositioning
+    - qml-module-qtquick-layouts
   files:
     include:
     - /usr/bin/bash
