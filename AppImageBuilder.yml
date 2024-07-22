@@ -1,0 +1,57 @@
+# appimage-builder recipe see https://appimage-builder.readthedocs.io for details
+version: 1
+AppDir:
+  path: build-dir/AppDir
+  app_info:
+    id: monitor
+    name: monitor
+    icon: icon.svg
+    version: latest
+    exec: usr/bin/gnss-sdr-monitor
+    exec_args: $@
+  apt:
+    arch: 
+      - amd64
+    allow_unauthenticated: true
+    sources:
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy main restricted
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy universe
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy multiverse
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+    - sourceline: deb http://security.ubuntu.com/ubuntu/ jammy-security main restricted
+    - sourceline: deb http://security.ubuntu.com/ubuntu/ jammy-security universe
+    - sourceline: deb http://security.ubuntu.com/ubuntu/ jammy-security multiverse
+    include:
+    - libc-bin
+    - libc6-dbg:amd64
+    - libcap2:amd64
+    - libcom-err2:amd64
+    - libdbus-1-3:amd64
+    - libexpat1:amd64
+    - libgpg-error0:amd64
+    - libkeyutils1:amd64
+    - liblzma5:amd64
+    - libpcre3:amd64
+    - libqt5gui5:amd64
+  files:
+    include:
+    - /usr/bin/bash
+    - /lib/x86_64-linux-gnu/libQt5PrintSupport.so.5
+    - /lib/x86_64-linux-gnu/libQt5XcbQpa.so.5
+    - /lib/x86_64-linux-gnu/libfftw3.so.3
+    - /lib/x86_64-linux-gnu/libgrpc++.so.1
+    - /lib/x86_64-linux-gnu/libiio.so.0
+    - /lib/x86_64-linux-gnu/libmatio.so.11
+    - /lib/x86_64-linux-gnu/libprotobuf.so.23
+    exclude:
+    - usr/share/man
+    - usr/share/doc/*/README.*
+    - usr/share/doc/*/changelog.*
+    - usr/share/doc/*/NEWS.*
+    - usr/share/doc/*/TODO.*
+AppImage:
+  arch: x86_64
+  update-information: guess
