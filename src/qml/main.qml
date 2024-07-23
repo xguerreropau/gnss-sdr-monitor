@@ -7,6 +7,7 @@ import QtPositioning 5.6
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
+
 Map
 {
     property variant cttc: QtPositioning.coordinate(41.27504, 1.987709)
@@ -14,17 +15,12 @@ Map
     id: map
     height: 300
 
-    plugin: Plugin
+    Plugin
     {
         id: mapPlugin
-        name: "esri"
-
-        PluginParameter
-        {
-            name: "esri.mapping.maximumZoomLevel"
-            value: 19.90
-        }
+        name: "mapboxgl"
     }
+    plugin: mapPlugin
     center: cttc
     zoomLevel: 15
 
@@ -72,7 +68,7 @@ Map
             text: "Follow"
         }
     }
-
+/*
     Connections
     {
         target: vehicle
@@ -84,4 +80,6 @@ Map
             }
         }
     }
+*/
 }
+

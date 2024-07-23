@@ -1,0 +1,36 @@
+FROM ubuntu:latest as base
+
+
+LABEL maintainer="xguerreropau@cttc.es"
+LABEL version="0.1"
+LABEL description="Docker Image to create a gnss-sdr-monitor AppImage"
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y cmake build-essential libqt5charts5-dev qtbase5-dev qtdeclarative5-dev libqt5serialport5-dev libboost-all-dev protobuf-compiler protobuf-compiler-grpc \
+   pkg-config libprotobuf-dev libprotobuf-c-dev qml-module-qtlocation qml-module-qtpositioning vim git tar python3-pip \
+   libgrpc-dev libgrpc++-dev qtlocation5-dev qtpositioning5-dev strace patchelf libglib2.0-dev squashfs-tools zsync desktop-file-utils appstream
+
+RUN apt remove -y python3-packaging
+
+RUN pip3 install --break-system-packages appimage-builder
+RUN pip3 install --break-system-packages packaging==21.3
+
+FROM base AS installed_packages
+WORKDIR /root
+RUN GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone https://github.com/xguerreropau/gnss-sdr-monitor.git
+
+WORKDIR gnss-sdr-monitor
+RUN cmake -S . -B build-dir -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+RUN cmake --build build-dir
+
+WORKDIR build-dir
+RUN make install DESTDIR=AppDir
+RUN cp -r src/gnss-sdr-monitor AppDir
+RUN cp src/gnss-sdr-monitor AppDir/usr/bin
+RUN mkdir -p AppDir/usr/share/icons/hicolor/64x64/apps
+RUN cp ../src/images/icon.svg AppDir/usr/share/icons/hicolor/64x64/apps/
+RUN ln -s AppDir/usr/share/icons/hicolor/64x64/apps/icon.svg
+RUN appimage-builder --recipe ../AppImageBuilder.yml
+
+CMD ["/bin/bash"]
+~
