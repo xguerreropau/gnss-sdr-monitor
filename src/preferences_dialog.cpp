@@ -45,6 +45,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent),
     ui->buffer_size_spinBox->setValue(settings.value("buffer_size", 1000).toInt());
     ui->port_gnss_synchro_spinBox->setValue(settings.value("port_gnss_synchro", 1111).toInt());
     ui->port_monitor_pvt_spinBox->setValue(settings.value("port_monitor_pvt", 1112).toInt());
+    ui->map_plugin->setCurrentText(settings.value("map_plugin", "esri").toString());
     settings.endGroup();
 
     connect(this, &PreferencesDialog::accepted, this, &PreferencesDialog::onAccept);
@@ -62,6 +63,7 @@ void PreferencesDialog::onAccept()
     settings.setValue("buffer_size", ui->buffer_size_spinBox->value());
     settings.setValue("port_gnss_synchro", ui->port_gnss_synchro_spinBox->value());
     settings.setValue("port_monitor_pvt", ui->port_monitor_pvt_spinBox->value());
+    settings.setValue("map_plugin", ui->map_plugin->currentText());
     settings.endGroup();
 
     qDebug() << "Preferences Saved";

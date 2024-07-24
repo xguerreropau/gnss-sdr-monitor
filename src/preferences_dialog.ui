@@ -64,6 +64,32 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="map_plugin">
+       <item>
+        <property name="text">
+         <string>esri</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>osm</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>mapboxgl</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Map plugin</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

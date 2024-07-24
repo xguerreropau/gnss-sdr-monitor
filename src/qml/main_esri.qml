@@ -18,7 +18,7 @@ Map
     Plugin
     {
         id: mapPlugin
-        name: "mapboxgl"
+        name: "esri"
     }
     plugin: mapPlugin
     center: cttc
@@ -68,7 +68,7 @@ Map
             text: "Follow"
         }
     }
-/*
+
     Connections
     {
         target: vehicle
@@ -80,6 +80,6 @@ Map
             }
         }
     }
-*/
+
 }
 

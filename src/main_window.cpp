@@ -42,6 +42,7 @@
 #include <QtCharts>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QNetworkDatagram>
+#include <QSizePolicy>
 #include <iostream>
 #include <sstream>
 
@@ -66,14 +67,13 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::TopDockWidgetArea, m_telecommandDockWidget);
     connect(m_telecommandWidget, &TelecommandWidget::resetClicked, this, &MainWindow::clearEntries);
 
-    // Map widget.
     m_mapDockWidget = new QDockWidget("Map", this);
-    m_mapWidget = new QQuickWidget(this);
-    m_mapWidget->rootContext()->setContextProperty("m_monitor_pvt_wrapper", m_monitorPvtWrapper);
-    m_mapWidget->setSource(QUrl(QStringLiteral("qrc:/qml/main.qml")));
-    m_mapWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    m_mapDockWidget->setWidget(m_mapWidget);
     addDockWidget(Qt::TopDockWidgetArea, m_mapDockWidget);
+
+    // Map widget.
+    setMapPlugin();
+    m_mapWidget->setMinimumWidth(250);
+    m_mapWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     // Altitude widget.
     m_altitudeDockWidget = new QDockWidget("Altitude", this);
@@ -82,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::TopDockWidgetArea, m_altitudeDockWidget);
     connect(m_monitorPvtWrapper, &MonitorPvtWrapper::altitudeChanged, m_altitudeWidget, &AltitudeWidget::addData);
     connect(&m_updateTimer, &QTimer::timeout, m_altitudeWidget, &AltitudeWidget::redraw);
+    m_altitudeWidget->setMinimumWidth(250);
+    m_altitudeWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     // Dilution of precision widget.
     m_DOPDockWidget = new QDockWidget("DOP", this);
@@ -90,6 +92,8 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::TopDockWidgetArea, m_DOPDockWidget);
     connect(m_monitorPvtWrapper, &MonitorPvtWrapper::dopChanged, m_DOPWidget, &DOPWidget::addData);
     connect(&m_updateTimer, &QTimer::timeout, m_DOPWidget, &DOPWidget::redraw);
+    m_DOPWidget->setMinimumWidth(250);
+    m_DOPWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     // QMenuBar.
     ui->actionQuit->setIcon(QIcon::fromTheme("application-exit"));
@@ -109,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_closePlotsAction = ui->mainToolBar->addAction("Close Plots");
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(m_telecommandDockWidget->toggleViewAction());
-    ui->mainToolBar->addAction(m_mapDockWidget->toggleViewAction());
+    //ui->mainToolBar->addAction(m_mapDockWidget->toggleViewAction());
     ui->mainToolBar->addAction(m_altitudeDockWidget->toggleViewAction());
     ui->mainToolBar->addAction(m_DOPDockWidget->toggleViewAction());
     m_start->setEnabled(false);
@@ -128,14 +132,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableView->setModel(m_model);
     ui->tableView->setShowGrid(false);
     ui->tableView->verticalHeader()->hide();
-    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    //ui->tableView->horizontalHeader()->setStretchLastSection(true);
     ui->tableView->setItemDelegateForColumn(5, new ConstellationDelegate());
     ui->tableView->setItemDelegateForColumn(6, new Cn0Delegate());
     ui->tableView->setItemDelegateForColumn(7, new DopplerDelegate());
     ui->tableView->setItemDelegateForColumn(9, new LedDelegate());
     // ui->tableView->setAlternatingRowColors(true);
     // ui->tableView->setSelectionBehavior(QTableView::SelectRows);
-
+    ui->tableView->setMinimumHeight(200);
+    ui->tableView->setMaximumHeight(300);
+    ui->tableView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding); // Allow expanding
     // Sockets.
     m_socketGnssSynchro = new QUdpSocket(this);
     m_socketMonitorPvt = new QUdpSocket(this);
@@ -153,6 +159,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() { delete ui; }
+
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -334,6 +341,8 @@ void MainWindow::showPreferences()
         &ChannelTableModel::setBufferSize);
     connect(preferences, &PreferencesDialog::accepted, this,
         &MainWindow::setPort);
+    connect(preferences, &PreferencesDialog::accepted, this,
+        &MainWindow::setMapPlugin);
     preferences->exec();
 }
 
@@ -348,7 +357,33 @@ void MainWindow::setPort()
     m_socketGnssSynchro->disconnectFromHost();
     m_socketGnssSynchro->bind(QHostAddress::Any, m_portGnssSynchro);
     m_socketMonitorPvt->bind(QHostAddress::Any, m_portMonitorPvt);
+
 }
+
+void MainWindow::setMapPlugin()
+{
+    QSettings settings;
+    settings.beginGroup("Preferences_Dialog");
+    m_mapPlugin = settings.value("map_plugin").toString();
+    settings.endGroup();
+
+    m_mapWidget = new QQuickWidget(this);
+    m_mapWidget->rootContext()->setContextProperty("m_monitor_pvt_wrapper", m_monitorPvtWrapper);
+    if (m_mapPlugin == "esri")
+    {
+        m_mapWidget->setSource(QUrl(QStringLiteral("qrc:/qml/main_esri.qml")));
+    } else if (m_mapPlugin == "osm") {
+        m_mapWidget->setSource(QUrl(QStringLiteral("qrc:/qml/main_osm.qml")));
+    } else
+    {
+        m_mapWidget->setSource(QUrl(QStringLiteral("qrc:/qml/main_mapboxgl.qml")));
+    }
+    m_mapWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    m_mapDockWidget->setWidget(m_mapWidget);
+}
+
+
 
 void MainWindow::expandPlot(const QModelIndex &index)
 {
@@ -550,3 +585,4 @@ void MainWindow::about()
 
     QMessageBox::about(this, "About gnss-sdr-monitor", text);
 }
+

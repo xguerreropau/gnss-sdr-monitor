@@ -73,6 +73,8 @@ public:
     void saveSettings();
     void loadSettings();
 
+    void setMapPlugin();
+
 public slots:
     void toggleCapture();
     void receiveGnssSynchro();
@@ -113,6 +115,7 @@ private:
     std::vector<int> m_channels;
     quint16 m_portGnssSynchro;
     quint16 m_portMonitorPvt;
+    QString m_mapPlugin;
     QSettings m_settings;
     QTimer m_updateTimer;
 

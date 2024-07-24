@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>qml/main.qml</file>
+        <file>qml/main_esri.qml</file>
+        <file>qml/main_osm.qml</file>
+        <file>qml/main_mapboxgl.qml</file>
         <file>images/icon.svg</file>
         <file>images/flag-cn.png</file>
         <file>images/flag-eu.png</file>
